@@ -1,21 +1,38 @@
 {
-  "name": "mern-portfolio",
+  "name": "professional-portfolio",
   "version": "1.0.0",
-  "description": "A portfolio project built with the MERN stack.",
-  "main": "src/app.js",
+  "description": "A professional portfolio website built with MERN stack",
+  "main": "server.js",
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "nodemon src/app.js"
+    "start": "node server.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon server.js",
+    "client": "cd client && npm start",
+    "build": "cd client && npm install && npm run build",
+    "install-client": "cd client && npm install",
+    "heroku-postbuild": "npm run install-client && npm run build"
   },
+  "keywords": [
+    "portfolio",
+    "mern",
+    "react",
+    "express",
+    "mongodb"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
   "dependencies": {
-    "express": "^4.17.1",
-    "mongoose": "^5.10.9",
-    "dotenv": "^8.2.0",
-    "cors": "^2.8.5"
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.8.7",
+    "multer": "^2.0.0-rc.4",
+    "nodemailer": "^6.9.4"
   },
   "devDependencies": {
-    "nodemon": "^2.0.4"
-  },
-  "author": "Your Name",
-  "license": "MIT"
+    "concurrently": "^8.2.0",
+    "nodemon": "^3.0.1"
+  }
 }
