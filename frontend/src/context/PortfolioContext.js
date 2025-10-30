@@ -41,7 +41,7 @@ export const PortfolioProvider = ({ children }) => {
   // Set up axios defaults
   useEffect(() => {
     // Set API base URL from environment
-    axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+    axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'https://deploy-backend-ok2g.onrender.com';
     const token = localStorage.getItem('token');
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
