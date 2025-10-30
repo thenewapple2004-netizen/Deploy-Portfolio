@@ -256,23 +256,14 @@ body.admin-route .nav-overlay-global {
   .admin-nav {
     display: none;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     padding: 0.5rem;
     gap: 0.5rem;
+    position: relative;
+    z-index: 1001; /* above any accidental overlays */
   }
 
-  .admin-nav.open {
-    display: flex;
-  }
-
-  .nav-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.35);
-    z-index: 50;
-  }
+  .admin-nav.open { display: flex; }
 
   .nav-item {
     white-space: nowrap;

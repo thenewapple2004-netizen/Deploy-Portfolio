@@ -112,9 +112,6 @@ const AdminDashboard = () => {
             </button>
           ))}
         </nav>
-        {isNavOpen && (
-          <div className="nav-overlay" onClick={() => setIsNavOpen(false)} />
-        )}
       </div>
 
       <div className="admin-content">
