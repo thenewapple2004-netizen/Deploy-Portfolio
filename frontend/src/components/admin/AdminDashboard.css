@@ -231,10 +231,13 @@
   .admin-sidebar {
     width: 100%;
     height: auto;
-    position: relative;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     border-right: none;
     border-bottom: 1px solid #e2e8f0;
+    z-index: 1000;
   }
 
   .menu-btn {
@@ -282,7 +285,7 @@
 
   .admin-content {
     margin-left: 0;
-    margin-top: 0;
+    margin-top: 70px;
     padding: 1rem;
     max-width: 100%;
     min-height: auto;
