@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { motion } from 'framer-motion';
 import { FaSave, FaUpload, FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 import { usePortfolio } from '../../context/PortfolioContext';
@@ -23,6 +24,8 @@ const PersonalInfoForm = () => {
     }
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isUploadingResume, setIsUploadingResume] = useState(false);
 
   useEffect(() => {
     if (portfolio?.personalInfo) {
@@ -88,6 +91,27 @@ const PersonalInfoForm = () => {
       console.error('Error updating personal info:', error);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const uploadFile = async (file, setUrl, setBusy) => {
+    if (!file) return;
+    const data = new FormData();
+    data.append('file', file);
+    setBusy(true);
+    try {
+      const res = await axios.post('/api/upload', data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      // Expecting { path: '/uploads/...' }
+      const uploadedPath = res?.data?.path || res?.data?.url || '';
+      if (uploadedPath) {
+        setUrl(uploadedPath);
+      }
+    } catch (err) {
+      console.error('Upload failed:', err);
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -220,6 +244,22 @@ const PersonalInfoForm = () => {
                 onChange={handleChange}
                 placeholder="https://example.com/image.jpg"
               />
+              <div className="upload-inline">
+                <input
+                  type="file"
+                  accept="image/*"
+                  id="profileImageFile"
+                  onChange={(e) => uploadFile(e.target.files?.[0],
+                    (url) => setFormData(prev => ({ ...prev, profileImage: url })),
+                    setIsUploadingImage)}
+                />
+                <button type="button" className="btn btn-secondary" onClick={() => {
+                  const input = document.getElementById('profileImageFile');
+                  input && input.click();
+                }} disabled={isUploadingImage}>
+                  {isUploadingImage ? 'Uploading...' : 'Upload Image'}
+                </button>
+              </div>
             </div>
 
             <div className="form-group">
@@ -234,6 +274,22 @@ const PersonalInfoForm = () => {
                 onChange={handleChange}
                 placeholder="https://example.com/resume.pdf"
               />
+              <div className="upload-inline">
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  id="resumeFile"
+                  onChange={(e) => uploadFile(e.target.files?.[0],
+                    (url) => setFormData(prev => ({ ...prev, resume: url })),
+                    setIsUploadingResume)}
+                />
+                <button type="button" className="btn btn-secondary" onClick={() => {
+                  const input = document.getElementById('resumeFile');
+                  input && input.click();
+                }} disabled={isUploadingResume}>
+                  {isUploadingResume ? 'Uploading...' : 'Upload CV'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
