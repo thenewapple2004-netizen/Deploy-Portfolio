@@ -22,6 +22,11 @@ const AdminDashboard = () => {
     if (typeof window !== 'undefined' && window.innerWidth <= 768) {
       setIsNavOpen(true);
     }
+    // Hide site navbar/mobile menu when in admin
+    document.body.classList.add('admin-route');
+    return () => {
+      document.body.classList.remove('admin-route');
+    };
   }, []);
   const [showChangePassword, setShowChangePassword] = useState(false);
 

@@ -27,6 +27,7 @@ const PersonalInfoForm = () => {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingResume, setUploadingResume] = useState(false);
   const [uploadNotice, setUploadNotice] = useState('');
+  const [uploadError, setUploadError] = useState('');
 
   useEffect(() => {
     if (portfolio?.personalInfo) {
@@ -116,6 +117,7 @@ const PersonalInfoForm = () => {
       if (!file) return;
       try {
         setUploadingImage(true);
+        setUploadError('');
         const { path, name } = await uploadFile(file);
         if (path) {
           setFormData(prev => ({ ...prev, profileImage: path, profileImageName: name }));
@@ -125,6 +127,7 @@ const PersonalInfoForm = () => {
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error('Image upload failed', err);
+        setUploadError('Image upload failed');
       } finally {
         setUploadingImage(false);
       }
@@ -141,6 +144,7 @@ const PersonalInfoForm = () => {
       if (!file) return;
       try {
         setUploadingResume(true);
+        setUploadError('');
         const { path, name } = await uploadFile(file);
         if (path) {
           setFormData(prev => ({ ...prev, resume: path, resumeName: name }));
@@ -150,6 +154,7 @@ const PersonalInfoForm = () => {
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error('Resume upload failed', err);
+        setUploadError('Resume upload failed');
       } finally {
         setUploadingResume(false);
       }
@@ -298,7 +303,10 @@ const PersonalInfoForm = () => {
             </div>
           </div>
           {uploadNotice && (
-            <div className="upload-notice">{uploadNotice}</div>
+            <div className="upload-notice success">{uploadNotice}</div>
+          )}
+          {uploadError && (
+            <div className="upload-notice error">{uploadError}</div>
           )}
         </div>
 

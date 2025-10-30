@@ -4,6 +4,15 @@
   background: #f7fafc;
 }
 
+/* When on admin route, hide any site-level navs/overlays */
+body.admin-route .mobile-nav,
+body.admin-route .mobile-menu,
+body.admin-route .site-navbar,
+body.admin-route .navbar,
+body.admin-route .nav-overlay-global {
+  display: none !important;
+}
+
 .admin-sidebar {
   width: 280px;
   background: white;
