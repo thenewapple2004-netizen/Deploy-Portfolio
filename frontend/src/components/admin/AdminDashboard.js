@@ -17,6 +17,12 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('personal');
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isNavOpen, setIsNavOpen] = useState(false);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+      setIsNavOpen(true);
+    }
+  }, []);
   const [showChangePassword, setShowChangePassword] = useState(false);
 
   const tabs = [
@@ -94,13 +100,16 @@ const AdminDashboard = () => {
             <button
               key={tab.id}
               className={`nav-item ${activeTab === tab.id ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => { setActiveTab(tab.id); if (window.innerWidth <= 768) setIsNavOpen(false); }}
             >
               <span className="nav-icon">{tab.icon}</span>
               <span className="nav-label">{tab.label}</span>
             </button>
           ))}
         </nav>
+        {isNavOpen && (
+          <div className="nav-overlay" onClick={() => setIsNavOpen(false)} />
+        )}
       </div>
 
       <div className="admin-content">

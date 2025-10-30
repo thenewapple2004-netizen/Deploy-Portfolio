@@ -23,7 +23,9 @@ const PersonalInfoForm = () => {
     }
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingResume, setUploadingResume] = useState(false);
+  const [uploadNotice, setUploadNotice] = useState('');
 
   useEffect(() => {
     if (portfolio?.personalInfo) {
@@ -92,37 +94,59 @@ const PersonalInfoForm = () => {
     }
   };
 
-  const handleFilePick = () => {
+  const uploadFile = async (file) => {
+    const data = new FormData();
+    data.append('file', file);
+    const res = await fetch('/api/upload', { method: 'POST', body: data });
+    const json = await res.json();
+    return json?.path || json?.url || '';
+  };
+
+  const handleImageUpload = () => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = 'image/*,application/pdf';
+    input.accept = 'image/*';
     input.onchange = async (e) => {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
-
-      const data = new FormData();
-      data.append('file', file);
       try {
-        setUploading(true);
-        // Upload to backend; expects { path: '/uploads/...' }
-        const res = await fetch('/api/upload', {
-          method: 'POST',
-          body: data
-        });
-        const json = await res.json();
-        const uploadedPath = json?.path || json?.url || '';
-        if (!uploadedPath) return;
-
-        if (file.type.startsWith('image/')) {
+        setUploadingImage(true);
+        const uploadedPath = await uploadFile(file);
+        if (uploadedPath) {
           setFormData(prev => ({ ...prev, profileImage: uploadedPath }));
-        } else {
-          setFormData(prev => ({ ...prev, resume: uploadedPath }));
+          setUploadNotice('Profile image uploaded successfully');
+          setTimeout(() => setUploadNotice(''), 2500);
         }
       } catch (err) {
         // eslint-disable-next-line no-console
-        console.error('Upload failed', err);
+        console.error('Image upload failed', err);
       } finally {
-        setUploading(false);
+        setUploadingImage(false);
+      }
+    };
+    input.click();
+  };
+
+  const handleResumeUpload = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/pdf';
+    input.onchange = async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      try {
+        setUploadingResume(true);
+        const uploadedPath = await uploadFile(file);
+        if (uploadedPath) {
+          setFormData(prev => ({ ...prev, resume: uploadedPath }));
+          setUploadNotice('Resume uploaded successfully');
+          setTimeout(() => setUploadNotice(''), 2500);
+        }
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('Resume upload failed', err);
+      } finally {
+        setUploadingResume(false);
       }
     };
     input.click();
@@ -246,21 +270,31 @@ const PersonalInfoForm = () => {
           <div className="form-row">
             <div className="form-group">
               <label>
-                <FaUpload /> Upload Profile Image or Resume (PDF)
+                <FaUpload /> Upload Profile Image
               </label>
-              <button type="button" className="btn btn-secondary" onClick={handleFilePick} disabled={uploading}>
-                <FaUpload /> {uploading ? 'Uploading...' : 'Upload File'}
+              <button type="button" className="btn btn-secondary" onClick={handleImageUpload} disabled={uploadingImage}>
+                <FaUpload /> {uploadingImage ? 'Uploading...' : 'Upload Image'}
               </button>
-              <div className="upload-summary">
-                {formData.profileImage && (
-                  <div className="upload-item">Profile Image set</div>
-                )}
-                {formData.resume && (
-                  <div className="upload-item">Resume set</div>
-                )}
-              </div>
+              {formData.profileImage && (
+                <div className="upload-item">Profile Image set</div>
+              )}
+            </div>
+
+            <div className="form-group">
+              <label>
+                <FaUpload /> Upload Resume (PDF)
+              </label>
+              <button type="button" className="btn btn-secondary" onClick={handleResumeUpload} disabled={uploadingResume}>
+                <FaUpload /> {uploadingResume ? 'Uploading...' : 'Upload Resume'}
+              </button>
+              {formData.resume && (
+                <div className="upload-item">Resume set</div>
+              )}
             </div>
           </div>
+          {uploadNotice && (
+            <div className="upload-notice">{uploadNotice}</div>
+          )}
         </div>
 
         <div className="form-section">
