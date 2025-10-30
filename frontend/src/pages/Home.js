@@ -1,26 +1,22 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import './styles/main.css';
+import Hero from '../components/Hero';
+import About from '../components/About';
+import Skills from '../components/Skills';
+import Projects from '../components/Projects';
+import Contact from '../components/Contact';
+import Footer from '../components/Footer';
 
 const Home = () => {
-    return (
-        <div className="home-container">
-            <header className="home-header">
-                <h1>Welcome to My Portfolio</h1>
-                <p>Explore my projects and skills.</p>
-                <nav>
-                    <Link to="/portfolio">View Portfolio</Link>
-                </nav>
-            </header>
-            <section className="home-introduction">
-                <h2>About Me</h2>
-                <p>
-                    I am a passionate developer with experience in building web applications using the MERN stack.
-                    My goal is to create responsive and user-friendly applications that provide value to users.
-                </p>
-            </section>
-        </div>
-    );
+  return (
+    <div className="home">
+      <Hero />
+      <About />
+      <Skills />
+      <Projects />
+      <Contact />
+      <Footer />
+    </div>
+  );
 };
 
 export default Home;

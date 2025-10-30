@@ -50,7 +50,7 @@ if (process.env.NODE_ENV === 'production') {
   }
 }
 
-const PORT = config.server.port;
+const PORT = process.env.PORT || 5000;
 
 // In serverless (Vercel), export the app instead of listening
 if (!process.env.VERCEL) {
