@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { motion } from 'framer-motion';
 import { FaSave, FaUpload, FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 import { usePortfolio } from '../../context/PortfolioContext';
@@ -24,8 +23,7 @@ const PersonalInfoForm = () => {
     }
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const [isUploadingResume, setIsUploadingResume] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (portfolio?.personalInfo) {
@@ -94,25 +92,40 @@ const PersonalInfoForm = () => {
     }
   };
 
-  const uploadFile = async (file, setUrl, setBusy) => {
-    if (!file) return;
-    const data = new FormData();
-    data.append('file', file);
-    setBusy(true);
-    try {
-      const res = await axios.post('/api/upload', data, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      // Expecting { path: '/uploads/...' }
-      const uploadedPath = res?.data?.path || res?.data?.url || '';
-      if (uploadedPath) {
-        setUrl(uploadedPath);
+  const handleFilePick = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*,application/pdf';
+    input.onchange = async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const data = new FormData();
+      data.append('file', file);
+      try {
+        setUploading(true);
+        // Upload to backend; expects { path: '/uploads/...' }
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: data
+        });
+        const json = await res.json();
+        const uploadedPath = json?.path || json?.url || '';
+        if (!uploadedPath) return;
+
+        if (file.type.startsWith('image/')) {
+          setFormData(prev => ({ ...prev, profileImage: uploadedPath }));
+        } else {
+          setFormData(prev => ({ ...prev, resume: uploadedPath }));
+        }
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('Upload failed', err);
+      } finally {
+        setUploading(false);
       }
-    } catch (err) {
-      console.error('Upload failed:', err);
-    } finally {
-      setBusy(false);
-    }
+    };
+    input.click();
   };
 
   return (
@@ -229,66 +242,22 @@ const PersonalInfoForm = () => {
         </div>
 
         <div className="form-section">
-          <h5>Media & Links</h5>
-          
+          <h5>Media Upload</h5>
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="profileImage">
-                <FaUpload /> Profile Image URL
+              <label>
+                <FaUpload /> Upload Profile Image or Resume (PDF)
               </label>
-              <input
-                type="url"
-                id="profileImage"
-                name="profileImage"
-                value={formData.profileImage}
-                onChange={handleChange}
-                placeholder="https://example.com/image.jpg"
-              />
-              <div className="upload-inline">
-                <input
-                  type="file"
-                  accept="image/*"
-                  id="profileImageFile"
-                  onChange={(e) => uploadFile(e.target.files?.[0],
-                    (url) => setFormData(prev => ({ ...prev, profileImage: url })),
-                    setIsUploadingImage)}
-                />
-                <button type="button" className="btn btn-secondary" onClick={() => {
-                  const input = document.getElementById('profileImageFile');
-                  input && input.click();
-                }} disabled={isUploadingImage}>
-                  {isUploadingImage ? 'Uploading...' : 'Upload Image'}
-                </button>
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="resume">
-                <FaUpload /> Resume URL
-              </label>
-              <input
-                type="url"
-                id="resume"
-                name="resume"
-                value={formData.resume}
-                onChange={handleChange}
-                placeholder="https://example.com/resume.pdf"
-              />
-              <div className="upload-inline">
-                <input
-                  type="file"
-                  accept="application/pdf"
-                  id="resumeFile"
-                  onChange={(e) => uploadFile(e.target.files?.[0],
-                    (url) => setFormData(prev => ({ ...prev, resume: url })),
-                    setIsUploadingResume)}
-                />
-                <button type="button" className="btn btn-secondary" onClick={() => {
-                  const input = document.getElementById('resumeFile');
-                  input && input.click();
-                }} disabled={isUploadingResume}>
-                  {isUploadingResume ? 'Uploading...' : 'Upload CV'}
-                </button>
+              <button type="button" className="btn btn-secondary" onClick={handleFilePick} disabled={uploading}>
+                <FaUpload /> {uploading ? 'Uploading...' : 'Upload File'}
+              </button>
+              <div className="upload-summary">
+                {formData.profileImage && (
+                  <div className="upload-item">Profile Image set</div>
+                )}
+                {formData.resume && (
+                  <div className="upload-item">Resume set</div>
+                )}
               </div>
             </div>
           </div>

@@ -42,6 +42,21 @@
   gap: 0.5rem;
 }
 
+.menu-btn {
+  display: none;
+  width: 35px;
+  height: 35px;
+  border: none;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  background: #e2e8f0;
+  color: #4a5568;
+}
+
 .preview-btn,
 .logout-btn {
   width: 35px;
@@ -222,11 +237,19 @@
     border-bottom: 1px solid #e2e8f0;
   }
 
+  .menu-btn {
+    display: inline-flex;
+  }
+
   .admin-nav {
-    display: flex;
+    display: none;
     overflow-x: auto;
     padding: 0.5rem;
     gap: 0.5rem;
+  }
+
+  .admin-nav.open {
+    display: flex;
   }
 
   .nav-item {

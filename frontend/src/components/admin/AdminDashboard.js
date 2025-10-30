@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaUser, FaSignOutAlt, FaCog, FaEye, FaEdit, FaKey } from 'react-icons/fa';
+import { FaBars } from 'react-icons/fa';
 import { usePortfolio } from '../../context/PortfolioContext';
 import PersonalInfoForm from './PersonalInfoForm';
 import SkillsManager from './SkillsManager';
@@ -15,6 +16,7 @@ const AdminDashboard = () => {
   const { logout } = usePortfolio();
   const [activeTab, setActiveTab] = useState('personal');
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
 
   const tabs = [
@@ -68,6 +70,13 @@ const AdminDashboard = () => {
           <h2>Admin Dashboard</h2>
           <div className="admin-actions">
             <button 
+              className="menu-btn"
+              onClick={() => setIsNavOpen(v => !v)}
+              title="Menu"
+            >
+              <FaBars />
+            </button>
+            <button 
               className="preview-btn"
               onClick={() => setIsPreviewMode(!isPreviewMode)}
               title={isPreviewMode ? 'Exit Preview' : 'Preview Site'}
@@ -80,7 +89,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <nav className="admin-nav">
+        <nav className={`admin-nav ${isNavOpen ? 'open' : ''}`}>
           {tabs.map((tab) => (
             <button
               key={tab.id}
