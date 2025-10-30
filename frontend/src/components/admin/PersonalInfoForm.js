@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { motion } from 'framer-motion';
 import { FaSave, FaUpload, FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 import { usePortfolio } from '../../context/PortfolioContext';
@@ -97,9 +98,13 @@ const PersonalInfoForm = () => {
   const uploadFile = async (file) => {
     const data = new FormData();
     data.append('file', file);
-    const res = await fetch('/api/upload', { method: 'POST', body: data });
-    const json = await res.json();
-    return json?.path || json?.url || '';
+    const res = await axios.post('/api/upload', data, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return {
+      path: res?.data?.path || res?.data?.url || '',
+      name: res?.data?.originalName || file.name
+    };
   };
 
   const handleImageUpload = () => {
@@ -111,9 +116,9 @@ const PersonalInfoForm = () => {
       if (!file) return;
       try {
         setUploadingImage(true);
-        const uploadedPath = await uploadFile(file);
-        if (uploadedPath) {
-          setFormData(prev => ({ ...prev, profileImage: uploadedPath }));
+        const { path, name } = await uploadFile(file);
+        if (path) {
+          setFormData(prev => ({ ...prev, profileImage: path, profileImageName: name }));
           setUploadNotice('Profile image uploaded successfully');
           setTimeout(() => setUploadNotice(''), 2500);
         }
@@ -136,9 +141,9 @@ const PersonalInfoForm = () => {
       if (!file) return;
       try {
         setUploadingResume(true);
-        const uploadedPath = await uploadFile(file);
-        if (uploadedPath) {
-          setFormData(prev => ({ ...prev, resume: uploadedPath }));
+        const { path, name } = await uploadFile(file);
+        if (path) {
+          setFormData(prev => ({ ...prev, resume: path, resumeName: name }));
           setUploadNotice('Resume uploaded successfully');
           setTimeout(() => setUploadNotice(''), 2500);
         }
@@ -276,7 +281,7 @@ const PersonalInfoForm = () => {
                 <FaUpload /> {uploadingImage ? 'Uploading...' : 'Upload Image'}
               </button>
               {formData.profileImage && (
-                <div className="upload-item">Profile Image set</div>
+                <div className="upload-item">{formData.profileImageName || formData.profileImage.split('/').pop()}</div>
               )}
             </div>
 
@@ -288,7 +293,7 @@ const PersonalInfoForm = () => {
                 <FaUpload /> {uploadingResume ? 'Uploading...' : 'Upload Resume'}
               </button>
               {formData.resume && (
-                <div className="upload-item">Resume set</div>
+                <div className="upload-item">{formData.resumeName || formData.resume.split('/').pop()}</div>
               )}
             </div>
           </div>
