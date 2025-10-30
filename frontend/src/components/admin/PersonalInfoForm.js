@@ -96,16 +96,17 @@ const PersonalInfoForm = () => {
     }
   };
 
-  const uploadFile = async (file) => {
+  const uploadFile = async (file, kind) => {
     const data = new FormData();
-    data.append('file', file);
-    const res = await axios.post('/api/upload', data, {
+    const fieldName = kind === 'image' ? 'profileImage' : 'resume';
+    data.append(fieldName, file);
+    const endpoint = kind === 'image' ? '/api/upload/profile-image' : '/api/upload/resume';
+    const res = await axios.post(endpoint, data, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
-    return {
-      path: res?.data?.path || res?.data?.url || '',
-      name: res?.data?.originalName || file.name
-    };
+    const fileUrl = res?.data?.fileUrl || res?.data?.url || '';
+    const fileName = res?.data?.filename || res?.data?.originalName || file.name;
+    return { path: fileUrl, name: fileName };
   };
 
   const handleImageUpload = () => {
@@ -118,7 +119,7 @@ const PersonalInfoForm = () => {
       try {
         setUploadingImage(true);
         setUploadError('');
-        const { path, name } = await uploadFile(file);
+        const { path, name } = await uploadFile(file, 'image');
         if (path) {
           setFormData(prev => ({ ...prev, profileImage: path, profileImageName: name }));
           setUploadNotice('Profile image uploaded successfully');
@@ -145,7 +146,7 @@ const PersonalInfoForm = () => {
       try {
         setUploadingResume(true);
         setUploadError('');
-        const { path, name } = await uploadFile(file);
+        const { path, name } = await uploadFile(file, 'resume');
         if (path) {
           setFormData(prev => ({ ...prev, resume: path, resumeName: name }));
           setUploadNotice('Resume uploaded successfully');
