@@ -101,3 +101,5 @@ uploads/
 *.backup
 *.bak
 *.tmp
+.env
+.env.*
